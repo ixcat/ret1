@@ -24,7 +24,8 @@ experiment_meta = schema.ExperimentMeta()
 experiment_data = schema.ExperimentData()
     
 dataroot = sys.argv[1]
-# dataroot = '/home/cat/Workspace/vathes/jobtest/crcns_ret-1/Data'
+# dataroot = '/usr/home/cat/Workspace/vathes/example/crcns_ret-1/Data'
+# TODO: need to also load in the random data - so should be top level dir 
 matfiles = glob(dataroot + '/*.mat')
 
 def process_file(fname):
