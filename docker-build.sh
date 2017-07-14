@@ -1,2 +1,3 @@
 #! /bin/sh
-(cd .. && docker build -t ret1/v0001 ret1)
+# TODO: image tag in rev-bump ext file
+exec docker build -t ret1:v0002 -t ret1:latest .
