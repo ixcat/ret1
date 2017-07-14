@@ -1,4 +1,6 @@
-# TODO: setup non-root user/grants
+# TODO: db: run service correctly
+# TODO: db: setup non-root user/grants
+# TODO: test: implement/actually run the test
 
 version: '2'
 
