@@ -1,0 +1,17 @@
+# TODO: setup non-root user/grants
+
+version: '2'
+
+services:
+    db:
+        image: ret1/v0001
+        environment:
+            MYSQL_ROOT_PASSWORD: example
+            DJ_USER: root
+            DJ_PASS: example
+        ports:
+          - '3306:3306'
+        volumes:
+          - ./data:/var/lib/mysql
+          - ./crcns_ret-1:/data
+
