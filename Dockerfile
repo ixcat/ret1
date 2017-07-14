@@ -24,12 +24,12 @@ RUN apt-get update &&\
 		cython &&\
 	pip3 install datajoint ipython
 
-CMD ["/bin/sh", "-c", "ipython"]
-
 # to test:
-# RUN git clone https://github.com/ixcat/ret1 \
+# RUN apt-get install -y git && git clone https://github.com/ixcat/ret1 \
 	&& cd ret1 \
 	&& python3 ./setup.py build install
+
+CMD ["/bin/sh", "-c", "ipython"]
 
 # CMD ret1_test.py /data
 
