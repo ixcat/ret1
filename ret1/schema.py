@@ -8,7 +8,7 @@ from pymysql import IntegrityError
 
 from .config import log
 
-schema = dj.schema(dj.config['myhack.database'], locals())
+schema = dj.schema(dj.config['database.schema'], locals())
 
 
 def schema_hacks():
@@ -26,7 +26,7 @@ def schema_hacks():
         user=dj.config['database.user'],
         host=dj.config['database.host'],
         password=dj.config['database.password'],
-        database=dj.config['myhack.database']
+        database=dj.config['database.schema']
     )
     c.query(experiment_data_pp)
     c.commit()
