@@ -9,7 +9,7 @@ import os.path
 
 from glob import glob
 
-from util import CrcnsFile
+from ret1.util import CrcnsFile
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

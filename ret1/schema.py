@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from config import *
+from .config import *
 
 schema = dj.schema(dj.config['myhack.database'], locals())
 

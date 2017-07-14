@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
-from config import *
+from ret1.config import *
 
-import util
-import schema
+import ret1.util as util
+import ret1.schema as schema
 
 def oldmain():
     animal = schema.Animal()
