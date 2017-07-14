@@ -1,6 +1,11 @@
-# bookmark:
-# - hack code experiment loading : OK
-# - manual stepthrough : OK
-# - batch run via 'push' : OK
-# - ( analysis table or autoload ) : BOOKMARK
-# - ( analysis table or autoload )
+code:
+- hack code experiment loading: OK
+- manual stepthrough: OK
+- batch run via 'push': OK
+- ( analysis table or autoload ) : BOOKMARK
+- ( analysis table or autoload )
+ops:
+- setup dj docker: OK
+- verify dj docker: OK
+- integrate w/code: INPROG
+- verify final run:
