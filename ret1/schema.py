@@ -1,14 +1,15 @@
 #! /usr/bin/env python
 
-from .config import *
+from .config import db, dj, np, log, IntegrityError
 
 schema = dj.schema(dj.config['myhack.database'], locals())
+
 
 def schema_hacks():
     experiment_data_pp = '''
     create view _experiment_data_pp as
-    select 
-    animal_id, date, sample_no, record, cell, 
+    select
+    animal_id, date, sample_no, record, cell,
     start, st_nframes, st_frame, st_onset, st_pixelsize, st_type,
     st_param_x, st_param_y, st_param_dx, st_param_dy, st_param_seed,
     length(spikes)
@@ -34,11 +35,12 @@ class Animal(dj.Manual):
     # or maybe this is a good thing to codify..
     animal_desc: varchar(128) unique
     '''
+
     def fetch_crcns(self, crcns):
         q = str('animal_desc = "' + crcns.animal + '"')
         log.debug('Animal::fetch_crcns(): q: ' + q)
         return (self & q).fetch(as_dict=True)
-    
+
     def insert_crcns(self, crcns):
         log.debug('Animal::insert_crcns(): crcns.animal: ' + str(crcns.animal))
         self.insert1((None, crcns.animal))
@@ -58,6 +60,7 @@ class ExperimentMeta(dj.Manual):
     ncells: integer
     nrecords: integer
     '''
+
     def fetch_crcns(self, crcns):
 
         animal = Animal()
@@ -72,14 +75,14 @@ class ExperimentMeta(dj.Manual):
                   + 'sq: ' + sq)
 
         return (self & aq & dq & sq).fetch(as_dict=True)
-    
+
     def insert_crcns(self, crcns):
 
         animal = Animal()
         subj = animal.fetch_crcns(crcns)
-        
+
         if len(subj) > 1:
-            raise IntegrityError('error: more than 1 animal for:' + cf.animal)
+            raise IntegrityError('error: more than 1 animal:' + crcns.animal)
 
         if len(subj) == 0:
             # hmm: do insert here or raise error?
@@ -105,7 +108,7 @@ class ExperimentMeta(dj.Manual):
 @schema
 class ExperimentData(dj.Imported):
     '''
-    XXX: fixme sloppy table normalization - 
+    XXX: fixme sloppy table normalization -
     better would be params:experiment 1:1,
     and cell:experiment 1:1,
     for now, geting imports working...
@@ -128,6 +131,7 @@ class ExperimentData(dj.Imported):
     st_param_seed: integer
     spikes: longblob
     '''
+
     def insert_crcns(self, crcns):
         for i in range(len(crcns.recno)):
             self.insert_crcns_recno(crcns, i)
@@ -144,7 +148,7 @@ class ExperimentData(dj.Imported):
         l.append(meta[0]['date'])
         l.append(meta[0]['sample_no'])
         l.append(crcns.recno[idx])
-        l.append(None) # cell placeholder
+        l.append(None)  # cell placeholder
 
         l.append(crcns.recstart[idx])
         l.append(crcns.stimulus[idx]['Nframes'])
@@ -179,5 +183,3 @@ class ExperimentData(dj.Imported):
                       + str(l2))
 
             self.insert1(l2)
-
-

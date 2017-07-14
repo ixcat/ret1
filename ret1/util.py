@@ -9,7 +9,7 @@ def mat_struct_to_dict(ms):
     for k in ms._fieldnames:
         v = ms.__getattribute__(k)
         if type(v) is mat_struct:
-            dct[k] = mat_struct_to_dict(v) # may the stack be with us...
+            dct[k] = mat_struct_to_dict(v)  # may the stack be with us...
         else:
             dct[k] = v
 
@@ -69,26 +69,24 @@ class CrcnsFile(object):
         ... spikes shape in ncell==1 different than recno fixups expect
         ... doesn't apply to current test data, so defer.
         '''
-        print('firstshape: ' + str(self.spikes.shape))
         # shape fixing for 1x record
         if type(self.recno) is int:
-            print('CrcnsFile._normalize(): self.recno is int')
             self.recno = [self.recno]
             # hmm - is always array or AoA; hack here rather than deciphering
             self.recstart = [self.recstart]
+            # spikes[cell][spike] -> spikes[cell][expno==0][spike]
             self.spikes.resize([len(self.spikes), 1])
             '''
             # XXX: to be deleted
             for c in range(len(self.spikes)):
                 print('CrcnsFile._normalize(): spikenormal')
-                print('before')                
+                print('before')
                 print(len(self.spikes))
                 print(str(self.spikes.shape))
                 print(len(self.spikes[c]))
                 print(str(self.spikes[c].shape))
-                # spikes[cell][spike] -> spikes[cell][expno==0][spike]
                 # hmm.. should be getting:
-                # ValueError: cannot resize this array: it does not own its data
+                # ValueError: cannot resize this array: ...
                 self.spikes[c].resize([1, len(self.spikes[c])])
                 print('after')
                 print(len(self.spikes))
@@ -97,12 +95,12 @@ class CrcnsFile(object):
                 print(str(self.spikes[c].shape))
             '''
 
-        # shape fixing for 1x cell                
+        # shape fixing for 1x cell
         if self.ncell == 1:
-            self.spikes = [self.spikes] # XXX: ndarray?
+            self.spikes = [self.spikes]  # XXX: ndarray?
 
         # de-matlabify stimulus data
-        new_stimulus = [] # XXX: ndarray?
+        new_stimulus = []  # XXX: ndarray?
 
         if type(self.stimulus) is mat_struct:
             self.stimulus = [self.stimulus]
@@ -119,8 +117,6 @@ class CrcnsFile(object):
         for i in range(len(self.recstart)):
             l.append(CrcnsFile.dateconv(self.recstart[i]))
         self.recstart = l
-        
-
 
     def print_meta(self):
         '''
@@ -152,8 +148,7 @@ class CrcnsFile(object):
         for s in self.stimulus:
             print('  - ')
             for k in s:
-                print('    ' + str(k) + ' : ' + str(s[k]) )
-
+                print('    ' + str(k) + ' : ' + str(s[k]))
 
         print('records: # nrecs: ' + str(len(self.recno)))
         for i in range(len(self.recno)):
@@ -163,5 +158,3 @@ class CrcnsFile(object):
             print('    spikes: ')
             for j in range(len(self.spikes)):
                 print('      - ' + str(len(self.spikes[j][i])))
-
-

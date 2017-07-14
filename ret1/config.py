@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 
 '''
-config module - 
-should be imported before any others via 'from config import *'
+config module -
+should be imported before any others
 '''
 
 import sys
-import os, os.path
+import os
+import os.path
 import logging
 from glob import glob
 from importlib import reload

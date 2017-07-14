@@ -14,6 +14,6 @@ setup(
     packages=find_packages(include=['ret1']),
     scripts=[
         'ret1/bin/ret1_test.py',
-        'ret1/bin/ret1_yml.py',        
+        'ret1/bin/ret1_yml.py',
     ]
 )
