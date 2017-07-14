@@ -12,11 +12,11 @@ import logging
 import datajoint as dj
 
 defaults = {
-    'database.host' : 'localhost',
-    'database.user' : 'vathes',
-    'database.password' : 'vathes',
-    'database.reconnect' : True,  # note: overriding dj defaults here
-    'database.schema' : 'vathes',  # hack: unspecified dj.config key
+    'database.host': 'localhost',
+    'database.user': 'vathes',
+    'database.password': 'vathes',
+    'database.reconnect': True,  # note: overriding dj defaults here
+    'database.schema': 'vathes',  # hack: unspecified dj.config key
 }
 
 dj.config['database.host'] = os.getenv('DJ_HOST')
