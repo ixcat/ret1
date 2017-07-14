@@ -12,5 +12,8 @@ setup(
     keywords='datajoint demo',
     url='http://fixme.io',
     packages=find_packages(include=['ret1']),
-    scripts=['ret1/bin/test.py']
+    scripts=[
+        'ret1/bin/ret1_test.py',
+        'ret1/bin/ret1_yml.py',        
+    ]
 )
