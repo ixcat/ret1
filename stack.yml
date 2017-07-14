@@ -6,7 +6,7 @@ version: '2'
 
 services:
     db:
-        image: ret1/v0001
+        image: ret1
         environment:
             MYSQL_ROOT_PASSWORD: example
             DJ_USER: root
