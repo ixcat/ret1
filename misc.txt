@@ -1,0 +1,17 @@
+# misc moveout:
+# - docs have 'databas.password' in creating a schema section
+# - verify: is there clear note that ipython is required for
+#   the 'pretty printing' e.g. '>>> mouse -> {fields, ... }'
+# - matlab .mat array fun in python might be good add'l docs or lib even
+#   though perhaps is in matlab lib (todo: audit)
+# - mysql reconnnect?
+# - enforcing uniqueness? e.g. mouse_id autoincrement with unique mouse name
+#   ... appending 'unique' actually works.. so codify/document?
+# - IntegrityError: document pymysql.err.IntegrityError as class
+# - when python restart is *really* required?2
+# - why '_experiment_data' tablename?
+# - decorator / classdef triggers db connect/mktable -
+#   e.g. schema is obj which connects, @schema refers to obj
+#   separate init/setup method; implies settings need to be in place at
+#   import time rather than runtime
+
