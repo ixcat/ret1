@@ -1,18 +1,25 @@
 #! /usr/bin/env python
 
-from .config import db, dj, np, log, IntegrityError
+import pymysql as db
+import numpy as np
+import datajoint as dj
+
+from pymysql import IntegrityError
+
+from .config import log
 
 schema = dj.schema(dj.config['myhack.database'], locals())
 
 
 def schema_hacks():
     experiment_data_pp = '''
+    -- view to pretty print _experiment_data table
     create view _experiment_data_pp as
     select
     animal_id, date, sample_no, record, cell,
     start, st_nframes, st_frame, st_onset, st_pixelsize, st_type,
     st_param_x, st_param_y, st_param_dx, st_param_dy, st_param_seed,
-    length(spikes)
+    length(spikes) as nspikes
     from _experiment_data;
     '''
     c = db.connect(
@@ -48,9 +55,6 @@ class Animal(dj.Manual):
 
 @schema
 class ExperimentMeta(dj.Manual):
-    '''
-    TODO: Stimulus data???
-    '''
     definition = '''
     -> Animal
     date: integer
@@ -168,10 +172,8 @@ class ExperimentData(dj.Imported):
         # .spikes[0].dtype -> dtype('O')
         # .spikes[0][0].dtype -> dtype('<f8')
         # ... here: >>> np.dtype('<f8') -> dtype('float64')
-        # dtype('O') not serialized in dj; so 1 record per cell
-
-        # ../crcns_ret-1/Data/20080628_R2.mat
-        # only has 1 record; so swapaxes doesn't "do"
+        # dtype('O') not serialized in dj;
+        # -> therefore 1 record per cell given current schema
 
         spike_swap = np.swapaxes(crcns.spikes, 0, 1)
         for i in range(len(spike_swap[idx])):

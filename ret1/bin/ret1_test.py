@@ -1,18 +1,15 @@
 #! /usr/bin/env python
 
-from ret1.config import *
+import sys
+import os.path
+from importlib import reload
+from glob import glob
 
+from pymysql.err import IntegrityError
+
+from ret1.config import log
 import ret1.util as util
 import ret1.schema as schema
-
-def oldmain():
-    animal = schema.Animal()
-    try:
-        animal.insert1((None, 'yoyo',))
-    except IntegrityError:
-        log.info('test note: duplicate animal insert attempted')
-    experiment_meta = schema.ExperimentMeta()
-    experiment_data = schema.ExperimentData()
 
 if len(sys.argv) < 2:
     print('usage: ' + os.path.basename(sys.argv[0]) + ' datadir')
@@ -48,7 +45,6 @@ def process_file(fname):
     experiment_data.insert_crcns(cf)
     return cf
     
-
 for mf in matfiles:
     log.info('# processing file: ' + mf)
     process_file(mf)

@@ -76,24 +76,6 @@ class CrcnsFile(object):
             self.recstart = [self.recstart]
             # spikes[cell][spike] -> spikes[cell][expno==0][spike]
             self.spikes.resize([len(self.spikes), 1])
-            '''
-            # XXX: to be deleted
-            for c in range(len(self.spikes)):
-                print('CrcnsFile._normalize(): spikenormal')
-                print('before')
-                print(len(self.spikes))
-                print(str(self.spikes.shape))
-                print(len(self.spikes[c]))
-                print(str(self.spikes[c].shape))
-                # hmm.. should be getting:
-                # ValueError: cannot resize this array: ...
-                self.spikes[c].resize([1, len(self.spikes[c])])
-                print('after')
-                print(len(self.spikes))
-                print(str(self.spikes.shape))
-                print(len(self.spikes[c]))
-                print(str(self.spikes[c].shape))
-            '''
 
         # shape fixing for 1x cell
         if self.ncell == 1:

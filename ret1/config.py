@@ -6,17 +6,9 @@ should be imported before any others
 '''
 
 import sys
-import os
-import os.path
 import logging
-from glob import glob
-from importlib import reload
 
-import pymysql as db
 import datajoint as dj
-import numpy as np
-
-from pymysql.err import IntegrityError
 
 dj.config['database.host'] = 'dev01'
 dj.config['database.user'] = 'vathes'
