@@ -1,6 +1,7 @@
-# TODO: db: run service correctly
-# TODO: db: setup non-root user/grants
-# TODO: test: implement/actually run the test
+# TODO: fix test in test vm - runs OK within os.system('/bin/sh') in repl,
+#    db-side connection abort after db recreate in test vm for some reason..
+# TODO: setup user-level grants/non-root acct
+# TODO: do user stuff with normal user privs
 
 version: '2'
 
@@ -9,10 +10,39 @@ services:
         image: ret1
         environment:
             MYSQL_ROOT_PASSWORD: example
-            DJ_USER: root
-            DJ_PASS: example
+        entrypoint: 
+          - /usr/local/bin/docker-entrypoint.sh
+          - mysqld
         ports:
           - '3306:3306'
+        volumes:
+          - ./data:/var/lib/mysql
+          - ./crcns_ret-1:/data
+    test:
+        image: ret1
+        links:
+          - "db:db"
+        environment:
+            DJ_HOST: db
+            DJ_USER: root
+            DJ_PASS: example
+        tty: true
+        stdin_open: true
+        entrypoint:
+          - /bin/sh
+          - '-c'
+          - 'sleep 10; /usr/local/bin/ret1_test.py /data/Data'
+    repl:
+        image: ret1
+        links:
+          - "db:db"
+        tty: true
+        stdin_open: true
+        environment:
+            DJ_HOST: db
+            DJ_USER: root
+            DJ_PASS: example
+        entrypoint: /usr/local/bin/ipython
         volumes:
           - ./data:/var/lib/mysql
           - ./crcns_ret-1:/data
