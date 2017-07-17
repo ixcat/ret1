@@ -15,9 +15,6 @@ services:
           - mysqld
         ports:
           - '3306:3306'
-        volumes:
-          - ./data:/var/lib/mysql
-          - ./crcns_ret-1:/data
     test:
         image: ret1
         links:
@@ -26,24 +23,21 @@ services:
             DJ_HOST: db
             DJ_USER: root
             DJ_PASS: example
-        tty: true
-        stdin_open: true
         entrypoint:
-          - /bin/sh
-          - '-c'
-          - 'sleep 10; /usr/local/bin/ret1_test.py /data/Data'
+          - /usr/local/bin/test-driver.sh
+        volumes:
+          - ./crcns_ret-1:/data
     repl:
         image: ret1
         links:
           - "db:db"
-        tty: true
         stdin_open: true
         environment:
+            TERM: vt100
             DJ_HOST: db
             DJ_USER: root
             DJ_PASS: example
         entrypoint: /usr/local/bin/ipython
         volumes:
-          - ./data:/var/lib/mysql
           - ./crcns_ret-1:/data
 

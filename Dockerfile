@@ -29,7 +29,7 @@ RUN apt-get install -y git && git clone https://github.com/ixcat/ret1 \
 	&& cd ret1 \
 	&& python3 ./setup.py build install
 
+ADD mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+ADD test-driver.sh /usr/local/bin/test-driver.sh
+
 CMD ["/bin/sh", "-c", "ipython"]
-
-# CMD /usr/local/bin/ret1_test.py /data
-
