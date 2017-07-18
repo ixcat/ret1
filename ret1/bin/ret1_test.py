@@ -30,7 +30,7 @@ matfiles = glob(dataroot + '/*.mat')
 
 
 def process_file(fname):
-    cf = util.CrcnsFile(mf)
+    cf = util.CrcnsFile(fname)
     cf.load()
     cf.print_meta()
     log.info('animal.insert_crcns')
