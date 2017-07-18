@@ -1,4 +1,5 @@
 FROM mysql
+ARG GITREV
 
 # merge of mysql, datajoint/mysql-docker and datajoint/pydev-docker + demo
 # initial build OK, awaiting build verify/git integ tests
@@ -24,7 +25,8 @@ RUN apt-get update &&\
 		cython &&\
 	pip3 install datajoint ipython
 
-RUN apt-get install -y git && git clone https://github.com/ixcat/ret1 \
+RUN GITREV=${GITREV} apt-get install -y git \
+	&& git clone https://github.com/ixcat/ret1 \
 	&& cd ret1 && git pull \
 	&& python3 ./setup.py build install
 
