@@ -24,9 +24,8 @@ RUN apt-get update &&\
 		cython &&\
 	pip3 install datajoint ipython
 
-# to test:
 RUN apt-get install -y git && git clone https://github.com/ixcat/ret1 \
-	&& cd ret1 \
+	&& cd ret1 && git pull \
 	&& python3 ./setup.py build install
 
 ADD mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
