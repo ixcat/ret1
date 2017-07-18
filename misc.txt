@@ -1,3 +1,17 @@
+# misc moveout #2:
+# - foreign key w/r/t insert1:
+#   either my usage is dumb, or this could potentially be parameterized
+#   e.g. insert1_fkey(fkey1,fkey2,... rest ...)
+#   saves having to resolve in depth and manually build query in client code
+#   however, with consistent data, can simply populate;
+#   however, not all files will have all data, so this still could be useful..
+# - big idea: ETL loader tool - but this is huge effort.
+#   e.g config:
+#   - match: /[]/[tblname]/[field1,field]
+#   - parms:
+#     - tblname: 1:1
+#     - field: 1:M
+#   or somesuch..
 # misc moveout:
 # - docs have 'databas.password' in creating a schema section
 # - verify: is there clear note that ipython is required for
