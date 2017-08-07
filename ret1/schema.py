@@ -234,7 +234,7 @@ class Spikes(dj.Manual):
 
         l.append(crcns.spikes[cellno][recidx])
 
-        log.info('Spikes::insert_crcns(): insert_tup: '
+        log.debug('Spikes::insert_crcns(): insert_tup: '
                  + str(l))
 
         self.insert1(l)

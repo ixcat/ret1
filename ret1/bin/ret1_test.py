@@ -51,7 +51,7 @@ def process_file(fname):
     log.info('experiment.insert_crcns')
     experiment.insert_crcns(cf)
 
-    log.info('TODO: spikes.insert_crcns')
+    log.info('spikes.insert_crcns')
     spikes.insert_crcns(cf)
 
 
