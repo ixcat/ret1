@@ -15,13 +15,18 @@ if len(sys.argv) < 2:
     print('usage: ' + os.path.basename(sys.argv[0]) + ' datadir')
     sys.exit(0)
 
+
+ONEFILE = False
+
 schema.schema.drop(force=True)
 reload(schema)
 schema.schema_hacks()
 
 animal = schema.Animal()
-experiment_meta = schema.ExperimentMeta()
-experiment_data = schema.ExperimentData()
+session = schema.Session()
+experiment = schema.Experiment()
+spikes = schema.Spikes()
+
 
 dataroot = sys.argv[1]
 # dataroot = '/usr/home/cat/Workspace/vathes/example/crcns_ret-1/Data'
@@ -40,14 +45,19 @@ def process_file(fname):
     except IntegrityError:
         log.info('animal.insert_crcns: duplicate animal')
 
-    log.info('experiment_meta.insert_crcns')
-    experiment_meta.insert_crcns(cf)
+    log.info('session.insert_crcns')
+    session.insert_crcns(cf)
 
-    log.info('experiment_data.insert_crcns')
-    experiment_data.insert_crcns(cf)
-    return cf
+    log.info('experiment.insert_crcns')
+    experiment.insert_crcns(cf)
+
+    log.info('TODO: spikes.insert_crcns')
+    spikes.insert_crcns(cf)
 
 
-for mf in matfiles:
-    log.info('# processing file: ' + mf)
-    process_file(mf)
+if ONEFILE is True:
+    process_file(matfiles[0])
+else:
+    for mf in matfiles:
+        log.info('# processing file: ' + mf)
+        process_file(mf)

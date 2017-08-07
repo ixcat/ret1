@@ -12,16 +12,8 @@ schema = dj.schema(dj.config['database.schema'], locals())
 
 
 def schema_hacks():
-    experiment_data_pp = '''
-    -- view to pretty print _experiment_data table
-    create view _experiment_data_pp as
-    select
-    animal_id, date, sample_no, record, cell,
-    start, st_nframes, st_frame, st_onset, st_pixelsize, st_type,
-    st_param_x, st_param_y, st_param_dx, st_param_dy, st_param_seed,
-    length(spikes) as nspikes
-    from _experiment_data;
-    '''
+    # todo: actual updated pretty-print sql
+    experiment_data_pp = '''show tables;'''
     c = db.connect(
         user=dj.config['database.user'],
         host=dj.config['database.host'],
@@ -39,7 +31,7 @@ class Animal(dj.Manual):
     ---
     # Note: dj unique use not? documented. +1 relying on undefined behavior.
     # could alternately be code level check or switch to text pkey,
-    # or maybe this is a good thing to codify..
+    # or maybe this is a goo1d thing to codify..
     animal_desc: varchar(128) unique
     '''
 
@@ -54,13 +46,14 @@ class Animal(dj.Manual):
 
 
 @schema
-class ExperimentMeta(dj.Manual):
+class Session(dj.Manual):
     definition = '''
     -> Animal
     date: integer
     sample_no: integer
     ---
     experimenter: varchar(128)
+    # ncells / nrecords, or records? or needed? (can be computed via db)
     ncells: integer
     nrecords: integer
     '''
@@ -101,26 +94,20 @@ class ExperimentMeta(dj.Manual):
             crcns.sampleno,
             crcns.experimenter,
             crcns.ncell,
-            len(crcns.recno),)
+            len(crcns.recno),
+        )
 
-        log.debug('ExperimentMeta::insert_crcns(): insert_tup: '
+        log.debug('Session::insert_crcns(): insert_tup: '
                   + str(insert_tup))
 
         self.insert1(insert_tup)
 
 
 @schema
-class ExperimentData(dj.Imported):
-    '''
-    XXX: fixme sloppy table normalization -
-    better would be params:experiment 1:1,
-    and cell:experiment 1:1,
-    for now, geting imports working...
-    '''
+class Experiment(dj.Manual):
     definition = '''
-    -> ExperimentMeta
+    -> Session
     record: integer
-    cell: integer
     ---
     start: timestamp
     st_nframes: integer
@@ -133,26 +120,67 @@ class ExperimentData(dj.Imported):
     st_param_dx: integer
     st_param_dy: integer
     st_param_seed: integer
-    spikes: longblob
     '''
+
+    def fetch_crcns(self, crcns, recno=None):
+        '''
+        Table where file is not 1:1 with query since 1:M in record
+        either:
+        1) have separate methods
+        2) single with optional recno defaulting to all
+        3) single with optional recno defaulting to 1st
+        going with #2, since it corresponds with relation to file
+        '''
+        session = Session()
+        cur_session = session.fetch_crcns(crcns)
+
+        if len(cur_session) > 1:
+            raise IntegrityError('error: duplicate sessions')
+
+        cur_session = cur_session[0]
+
+        aq = str('animal_id = ' + str(cur_session['animal_id']))
+        dq = str('date = ' + str(crcns.date))
+        sq = str('sample_no = ' + str(crcns.sampleno))
+
+        result = None
+        if recno is None:
+            log.debug('ExperimentMeta::fetch_crcns(recno=None): '
+                      + 'aq: ' + aq
+                      + 'dq: ' + dq
+                      + 'sq: ' + sq)
+
+            result = (self & aq & dq & sq).fetch(as_dict=True)
+        else:
+            rq = str('record = ' + str(recno))
+
+            log.debug('ExperimentMeta::fetch_crcns(recno=' + str(recno) + '): '
+                      + 'aq: ' + aq
+                      + 'dq: ' + dq
+                      + 'sq: ' + sq
+                      + 'rq: ' + rq)
+
+            result = (self & aq & dq & sq & rq).fetch(as_dict=True)
+
+        return result
 
     def insert_crcns(self, crcns):
         for i in range(len(crcns.recno)):
             self.insert_crcns_recno(crcns, i)
 
     def insert_crcns_recno(self, crcns, idx):
-        experiment_meta = ExperimentMeta()
-        meta = experiment_meta.fetch_crcns(crcns)
+        session = Session()
+        cur_session = session.fetch_crcns(crcns)
 
-        if len(meta) > 1:
-            raise IntegrityError('error: duplicate experiment metadata')
+        if len(cur_session) > 1:
+            raise IntegrityError('error: duplicate sessions')
 
+        cur_session = cur_session[0]
         l = []
-        l.append(meta[0]['animal_id'])
-        l.append(meta[0]['date'])
-        l.append(meta[0]['sample_no'])
+        l.append(cur_session['animal_id'])
+        l.append(cur_session['date'])
+        l.append(cur_session['sample_no'])
         l.append(crcns.recno[idx])
-        l.append(None)  # cell placeholder
 
         l.append(crcns.recstart[idx])
         l.append(crcns.stimulus[idx]['Nframes'])
@@ -166,22 +194,47 @@ class ExperimentData(dj.Imported):
         l.append(crcns.stimulus[idx]['param']['dy'])
         l.append(crcns.stimulus[idx]['param']['seed'])
 
-        # spikes[cell][expno][spike] -> spikes[expno][cell][spike]
-        # grr:
-        # .spikes.dtype -> dtype('O')
-        # .spikes[0].dtype -> dtype('O')
-        # .spikes[0][0].dtype -> dtype('<f8')
-        # ... here: >>> np.dtype('<f8') -> dtype('float64')
-        # dtype('O') not serialized in dj;
-        # -> therefore 1 record per cell given current schema
+        self.insert1(l)
 
-        spike_swap = np.swapaxes(crcns.spikes, 0, 1)
-        for i in range(len(spike_swap[idx])):
-            l2 = l.copy()
-            l2[4] = i
-            l2.append(spike_swap[idx][i])
 
-            log.debug('ExperimentMeta::insert_crcns(): insert_tup: '
-                      + str(l2))
+@schema
+class Spikes(dj.Manual):
+    definition = '''
+    -> Experiment
+    cell: integer
+    ---
+    spikes: longblob
+    '''
 
-            self.insert1(l2)
+    def fetch_crcns(self, crcns, recno=None, cellno=None):
+        raise NotImplementedError
+
+    def insert_crcns(self, crcns):
+        for i in range(len(crcns.recno)):
+            for j in range(len(crcns.spikes)):
+                self.insert_crcns_spikes(crcns, i, j)
+
+    def insert_crcns_spikes(self, crcns, recidx, cellno):
+
+        recno = crcns.recno[recidx]
+        experiment = Experiment()
+        cur_experiment = experiment.fetch_crcns(crcns, recno)
+
+        if len(cur_experiment) > 1:
+            raise IntegrityError('error: duplicate experiments')
+
+        cur_experiment = cur_experiment[0]
+
+        l = []
+        l.append(cur_experiment['animal_id'])
+        l.append(cur_experiment['date'])
+        l.append(cur_experiment['sample_no'])
+        l.append(recno)
+        l.append(cellno)
+
+        l.append(crcns.spikes[cellno][recidx])
+
+        log.info('Spikes::insert_crcns(): insert_tup: '
+                 + str(l))
+
+        self.insert1(l)
