@@ -7,5 +7,5 @@ code:
 ops:
 - setup dj docker: OK
 - verify dj docker: OK
-- integrate w/code: INPROG
-- verify final run:
+- integrate w/code: OK
+- verify final run: OK
